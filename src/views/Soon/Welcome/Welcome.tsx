@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loading } from '@/components/shared'
-import Projects from '@/views/project/ProjectDashboard/components/Projects'
-import { apiGetDriverProjects } from './api/api'
 import { Button, Card, Tag } from '@/components/ui'
 import { HiOutlineArrowRight } from 'react-icons/hi'
 import ProgressBar from '@/views/workprogress/progress/progress/ProgressBar'
+import { apiGetDriverProjects } from './api/api'
 
 interface Project {
   id: string;
@@ -61,6 +60,11 @@ const ProjectDashboard = () => {
     fetchData()
   }, [])
 
+  // Check if project is viewable (status is "work_started" or "in_progress")
+  const isProjectViewable = (status: string) => {
+    return status === "work_started" || status === "in_progress"
+  }
+
   return (
     <div className="flex flex-col gap-4 h-full">
       <Loading loading={loading}>
@@ -78,56 +82,68 @@ const ProjectDashboard = () => {
               
               {projects.length > 0 ? (
                 <div className="space-y-4">
-                  {projects.map((project) => (
-                    <Card key={project.id} bordered className="hover:shadow-lg transition-shadow">
-                      <div className="p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h5 className="font-semibold dark:text-gray-200">
-                              {project.projectName} ({project.projectNumber})
-                            </h5>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {project.location}
-                            </p>
+                  {projects.map((project) => {
+                    const canView = isProjectViewable(project.status)
+                    
+                    return (
+                      <Card key={project.id} bordered className="hover:shadow-lg transition-shadow">
+                        <div className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h5 className="font-semibold dark:text-gray-200">
+                                {project.projectName} ({project.projectNumber})
+                              </h5>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {project.location}
+                              </p>
+                            </div>
+                            <Tag className="text-xs capitalize">
+                              {project.status.replace('_', ' ')}
+                            </Tag>
                           </div>
-                          <Tag className="text-xs capitalize">
-                            {project.status.replace('_', ' ')}
-                          </Tag>
-                        </div>
-                        
-                        <div className="mb-3">
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-gray-500 dark:text-gray-400">Progress</span>
-                            <span className="font-semibold">{project.progress}%</span>
+                          
+                          <div className="mb-3">
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-500 dark:text-gray-400">Progress</span>
+                              <span className="font-semibold">{project.progress}%</span>
+                            </div>
+                            <ProgressBar 
+                              percent={project.progress} 
+                              showInfo={false}
+                              className="h-2"
+                            />
                           </div>
-                          <ProgressBar 
-                            percent={project.progress} 
-                            showInfo={false}
-                            className="h-2"
-                          />
-                        </div>
-                        
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                              Client: {project.client.clientName}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Team: {project.assignedWorkers.length} workers
-                            </p>
+                          
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                Client: {project.client.clientName}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Team: {project.assignedWorkers.length} workers
+                              </p>
+                            </div>
+                            <Button
+                              size="xs"
+                              variant="plain"
+                              icon={<HiOutlineArrowRight />}
+                              onClick={() => navigate(`/drv/project-attendance/${project.id}`)}
+                              disabled={!canView}
+                              title={canView ? "View project details" : "Project not yet started"}
+                            >
+                              View
+                            </Button>
                           </div>
-                          <Button
-                            size="xs"
-                            variant="plain"
-                            icon={<HiOutlineArrowRight />}
-                            onClick={() => navigate(`/drv/project-attendance/${project.id}`)}
-                          >
-                            View
-                          </Button>
+                          
+                          {!canView && (
+                            <div className="mt-2 text-xs text-amber-500 dark:text-amber-400">
+                              Project will be available when work starts
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    )
+                  })}
                 </div>
               ) : (
                 <Card className="text-center py-8">

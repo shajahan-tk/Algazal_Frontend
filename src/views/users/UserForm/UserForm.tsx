@@ -102,26 +102,23 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
     }, [initialData])
 
     const validationSchema = Yup.object().shape({
-        firstName: Yup.string().required('First Name Required'),
-        lastName: Yup.string().required('Last Name Required'),
-        email: Yup.string().email('Invalid email').required('Email Required'),
-        role: Yup.string().required('Role is Required'),
+        firstName: Yup.string().required('First Name is required'),
+        lastName: Yup.string().required('Last Name is required'),
+        email: Yup.string().email('Invalid email').required('Email is required'),
+        role: Yup.string().required('Role is required'),
         password: type === 'new' 
-            ? Yup.string().required('Password is Required') 
+            ? Yup.string().required('Password is required') 
             : Yup.string(),
         phoneNumbers: Yup.array()
             .of(Yup.string().matches(/^[0-9]+$/, 'Phone number must be digits only'))
             .min(1, 'At least one phone number is required'),
-            salary: Yup.number()
+        salary: Yup.number()
             .moreThan(0, 'Salary must be greater than zero')
             .when('role', {
                 is: (role: string) => !['admin', 'super_admin'].includes(role),
                 then: (schema) => schema.required('Salary is required for this role'),
                 otherwise: (schema) => schema.notRequired()
-            })
-            .required('Salary is required for this role'),
-
-
+            }),
         accountNumber: Yup.string(),
         emiratesId: Yup.string(),
         passportNumber: Yup.string()
@@ -291,7 +288,7 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <FormItem
                                                 label="First Name"
-                                                invalid={!!(errors.firstName && touched.firstName)}
+                                                invalid={!!errors.firstName && touched.firstName}
                                                 errorMessage={errors.firstName as string}
                                             >
                                                 <Field
@@ -305,7 +302,7 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
 
                                             <FormItem
                                                 label="Last Name"
-                                                invalid={!!(errors.lastName && touched.lastName)}
+                                                invalid={!!errors.lastName && touched.lastName}
                                                 errorMessage={errors.lastName as string}
                                             >
                                                 <Field
@@ -321,7 +318,7 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <FormItem
                                                 label="Email"
-                                                invalid={!!(errors.email && touched.email)}
+                                                invalid={!!errors.email && touched.email}
                                                 errorMessage={errors.email as string}
                                             >
                                                 <Field
@@ -335,7 +332,7 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
 
                                             <FormItem
                                                 label="Role"
-                                                invalid={!!(errors.role && touched.role)}
+                                                invalid={!!errors.role && touched.role}
                                                 errorMessage={errors.role as string}
                                             >
                                                 <Field name="role">
@@ -363,7 +360,7 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
                                         {showSalaryField && (
                                             <FormItem
                                                 label="Salary"
-                                                invalid={!!(errors.salary && touched.salary)}
+                                                invalid={!!errors.salary && touched.salary}
                                                 errorMessage={errors.salary as string}
                                             >
                                                 <Field
@@ -527,8 +524,6 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <FormItem
                                                 label="Profile Image"
-                                                invalid={!!(errors.profileImage && touched.profileImage)}
-                                                errorMessage={errors.profileImage as string}
                                             >
                                                 <Upload 
                                                     onChange={(files) => handleProfileImageChange(files)}
@@ -546,8 +541,6 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
 
                                             <FormItem
                                                 label="Signature Image"
-                                                invalid={!!(errors.signatureImage && touched.signatureImage)}
-                                                errorMessage={errors.signatureImage as string}
                                             >
                                                 <Upload 
                                                     onChange={(files) => handleSignatureImageChange(files)}
@@ -570,7 +563,7 @@ const UserForm = forwardRef<FormikRef, UserForm>((props, ref) => {
                                             <h5 className="mb-4">Security</h5>
                                             <FormItem
                                                 label="Password"
-                                                invalid={!!(errors.password && touched.password)}
+                                                invalid={!!errors.password && touched.password}
                                                 errorMessage={errors.password as string}
                                             >
                                                 <Field
